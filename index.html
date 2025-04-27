@@ -75,6 +75,8 @@
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
+            width: 100%;
+            overflow-x: auto;
         }
 
         .calendar-header {
@@ -117,14 +119,16 @@
         .weekday {
             text-align: center;
             font-weight: 500;
-            padding: 8px;
+            padding: 8px 4px;
             background-color: rgba(30, 30, 30, 0.8);
             border-radius: 8px;
             color: #00ffff;
-            font-size: 0.9em;
+            font-size: 0.8em;
             text-transform: uppercase;
             letter-spacing: 1px;
             border: 1px solid rgba(0, 255, 255, 0.1);
+            min-width: 40px;
+            white-space: nowrap;
         }
 
         .day {
@@ -421,12 +425,54 @@
             pointer-events: none;
             z-index: 0;
         }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+
+            .calendar-header h2 {
+                font-size: 1.2em;
+            }
+
+            .calendar-header button {
+                padding: 6px 12px;
+                font-size: 0.7em;
+            }
+
+            .day {
+                min-height: 35px;
+                font-size: 0.75em;
+            }
+
+            .event-item {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .delete-btn {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
     </style>
+    <!-- Add Google Sign-In API -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
 </head>
 <body>
     <div class="container">
         <div class="decorative-circle circle-1"></div>
         <div class="decorative-circle circle-2"></div>
+        
+        <!-- Add Google Sign-In Button -->
+        <div id="auth-section" style="margin-bottom: 20px; text-align: center;">
+            <div id="login-status" style="margin-bottom: 10px;"></div>
+            <div id="google-signin-button" class="g-signin2" data-onsuccess="onSignIn"></div>
+            <button id="signout-button" onclick="signOut()" style="display: none;" class="btn">Sair</button>
+        </div>
+
         <div class="events-list" id="events-list">
             <!-- Events will be displayed here -->
         </div>
@@ -497,8 +543,48 @@
 
     <script>
         let currentDate = new Date();
-        let events = JSON.parse(localStorage.getItem('events')) || [];
+        let events = [];
         let selectedEmoji = '✨';
+        let currentUser = null;
+
+        // Google Sign-In functions
+        function onSignIn(googleUser) {
+            currentUser = googleUser;
+            const profile = googleUser.getBasicProfile();
+            document.getElementById('login-status').innerHTML = `Bem-vindo, ${profile.getName()}!`;
+            document.getElementById('google-signin-button').style.display = 'none';
+            document.getElementById('signout-button').style.display = 'block';
+            
+            // Load user's events from Firebase or your backend
+            loadUserEvents(profile.getId());
+        }
+
+        function signOut() {
+            const auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                currentUser = null;
+                document.getElementById('login-status').innerHTML = '';
+                document.getElementById('google-signin-button').style.display = 'block';
+                document.getElementById('signout-button').style.display = 'none';
+                events = [];
+                updateCalendar();
+            });
+        }
+
+        function loadUserEvents(userId) {
+            // Here you would typically fetch events from your backend
+            // For now, we'll use localStorage with a user-specific key
+            const userEvents = JSON.parse(localStorage.getItem(`events_${userId}`)) || [];
+            events = userEvents;
+            updateCalendar();
+        }
+
+        function saveUserEvents() {
+            if (currentUser) {
+                const userId = currentUser.getBasicProfile().getId();
+                localStorage.setItem(`events_${userId}`, JSON.stringify(events));
+            }
+        }
 
         // Emoji selector functionality
         document.querySelectorAll('.emoji-option').forEach(option => {
@@ -605,6 +691,11 @@
         }
 
         function saveEvent() {
+            if (!currentUser) {
+                alert('Por favor, faça login para salvar eventos.');
+                return;
+            }
+
             const title = document.getElementById('event-title').value;
             const date = document.getElementById('event-date').value;
             const time = document.getElementById('event-time').value;
@@ -625,16 +716,21 @@
             };
 
             events.push(newEvent);
-            localStorage.setItem('events', JSON.stringify(events));
+            saveUserEvents();
             
             closeModal();
             updateCalendar();
         }
 
         function deleteEvent(eventId) {
+            if (!currentUser) {
+                alert('Por favor, faça login para excluir eventos.');
+                return;
+            }
+
             if (confirm('Tem certeza que deseja excluir este evento?')) {
                 events = events.filter(event => event.id !== eventId);
-                localStorage.setItem('events', JSON.stringify(events));
+                saveUserEvents();
                 updateCalendar();
             }
         }
