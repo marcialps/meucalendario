@@ -286,7 +286,7 @@
         }
 
         .events-list {
-            margin-top: 20px;
+            margin-bottom: 20px;
             position: relative;
             z-index: 1;
         }
@@ -427,6 +427,9 @@
     <div class="container">
         <div class="decorative-circle circle-1"></div>
         <div class="decorative-circle circle-2"></div>
+        <div class="events-list" id="events-list">
+            <!-- Events will be displayed here -->
+        </div>
         <div class="calendar-header">
             <button onclick="previousMonth()">&lt; Anterior</button>
             <h2 id="current-month">Dezembro 2023</h2>
@@ -440,9 +443,6 @@
             <div class="weekday">Qui</div>
             <div class="weekday">Sex</div>
             <div class="weekday">Sáb</div>
-        </div>
-        <div class="events-list" id="events-list">
-            <!-- Events will be displayed here -->
         </div>
     </div>
 
