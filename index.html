@@ -15,7 +15,7 @@
 
         body {
             background-color: #0a0a0a;
-            padding: 20px;
+            padding: 10px;
             color: #ffffff;
             min-height: 100vh;
             display: flex;
@@ -40,12 +40,13 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 100%;
+            width: 100%;
             margin: 0 auto;
             background-color: rgba(20, 20, 20, 0.8);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
-            padding: 30px;
+            padding: 15px;
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(10px);
@@ -71,35 +72,47 @@
         .calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
+            gap: 4px;
             margin-bottom: 20px;
             position: relative;
             z-index: 1;
             width: 100%;
-            overflow-x: auto;
         }
 
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             position: relative;
             z-index: 1;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .calendar-header h2 {
+            font-size: 1.2em;
+            font-weight: 600;
+            text-transform: capitalize;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            flex: 1;
+            text-align: center;
         }
 
         .calendar-header button {
             background: transparent;
             color: #00ffff;
             border: 1px solid rgba(0, 255, 255, 0.3);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
             text-transform: uppercase;
-            font-size: 0.8em;
+            font-size: 0.7em;
             letter-spacing: 1px;
+            white-space: nowrap;
         }
 
         .calendar-header button:hover {
@@ -108,43 +121,37 @@
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
         }
 
-        .calendar-header h2 {
-            font-size: 1.5em;
-            font-weight: 600;
-            text-transform: capitalize;
-            color: #00ffff;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
         .weekday {
             text-align: center;
             font-weight: 500;
-            padding: 8px 4px;
+            padding: 4px 2px;
             background-color: rgba(30, 30, 30, 0.8);
             border-radius: 8px;
             color: #00ffff;
-            font-size: 0.8em;
+            font-size: 0.7em;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             border: 1px solid rgba(0, 255, 255, 0.1);
-            min-width: 40px;
+            min-width: 0;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .day {
             aspect-ratio: 1;
-            padding: 5px;
+            padding: 2px;
             border: 1px solid rgba(0, 255, 255, 0.1);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
-            font-size: 0.85em;
+            font-size: 0.75em;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 45px;
+            min-height: 35px;
             background-color: rgba(20, 20, 20, 0.8);
             color: #ffffff;
         }
@@ -297,7 +304,7 @@
 
         .event-item {
             background: rgba(30, 30, 30, 0.8);
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             margin-bottom: 10px;
             display: flex;
@@ -305,6 +312,8 @@
             align-items: center;
             transition: all 0.3s;
             border: 1px solid rgba(0, 255, 255, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .event-item:hover {
@@ -314,7 +323,8 @@
         }
 
         .event-info {
-            flex-grow: 1;
+            flex: 1;
+            min-width: 200px;
         }
 
         .event-title {
@@ -337,12 +347,12 @@
             background: transparent;
             color: #ff3366;
             border: 1px solid rgba(255, 51, 102, 0.3);
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            margin-left: 10px;
             transition: all 0.3s;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .delete-btn:hover {
@@ -428,32 +438,49 @@
 
         @media (max-width: 600px) {
             .container {
-                padding: 15px;
-                margin: 10px;
+                padding: 10px;
+                margin: 5px;
             }
 
-            .calendar-header h2 {
-                font-size: 1.2em;
+            .calendar-header {
+                flex-direction: column;
+                align-items: stretch;
             }
 
             .calendar-header button {
-                padding: 6px 12px;
-                font-size: 0.7em;
+                width: 100%;
+            }
+
+            .weekday {
+                font-size: 0.65em;
+                padding: 3px 1px;
             }
 
             .day {
-                min-height: 35px;
-                font-size: 0.75em;
+                min-height: 30px;
+                font-size: 0.7em;
             }
 
             .event-item {
                 flex-direction: column;
-                gap: 10px;
+                align-items: stretch;
+            }
+
+            .event-info {
+                min-width: 100%;
             }
 
             .delete-btn {
                 width: 100%;
-                margin-left: 0;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+
+            .form-group input {
+                font-size: 16px; /* Prevents zoom on iOS */
             }
         }
     </style>
