@@ -483,9 +483,167 @@
                 font-size: 16px; /* Prevents zoom on iOS */
             }
         }
+
+        /* Notification Modal Styles */
+        .notification-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+        }
+
+        .notification-content {
+            background-color: rgba(20, 20, 20, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .notification-header h3 {
+            color: #00ffff;
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .notification-item {
+            background: rgba(30, 30, 30, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .notification-item:hover {
+            transform: translateX(5px);
+            border-color: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #00ffff;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-time {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .notification-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .notification-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+        }
+
+        .notification-btn.primary {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .notification-btn.secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .notification-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff3366;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
+    <!-- Add Notification Modal -->
+    <div class="notification-modal" id="notification-modal">
+        <div class="notification-content">
+            <div class="notification-header">
+                <h3>Eventos Próximos</h3>
+                <span class="close" onclick="closeNotificationModal()">&times;</span>
+            </div>
+            <div class="notification-list" id="notification-list">
+                <!-- Notifications will be added here -->
+            </div>
+            <div class="notification-actions">
+                <button class="notification-btn secondary" onclick="closeNotificationModal()">Fechar</button>
+                <button class="notification-btn primary" onclick="goToCalendar()">Ir para Calendário</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="decorative-circle circle-1"></div>
         <div class="decorative-circle circle-2"></div>
@@ -727,6 +885,69 @@
                 eventsList.appendChild(eventDiv);
             });
         }
+
+        // Notification functions
+        function checkUpcomingEvents() {
+            const now = new Date();
+            const upcomingEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                const timeDiff = eventDate - now;
+                const hoursLeft = timeDiff / (1000 * 60 * 60);
+                return hoursLeft <= 24 && hoursLeft > 0;
+            });
+
+            if (upcomingEvents.length > 0) {
+                showNotificationModal(upcomingEvents);
+            }
+        }
+
+        function showNotificationModal(upcomingEvents) {
+            const modal = document.getElementById('notification-modal');
+            const notificationList = document.getElementById('notification-list');
+            notificationList.innerHTML = '';
+
+            upcomingEvents.forEach(event => {
+                const eventDate = new Date(event.date);
+                const timeDiff = eventDate - new Date();
+                const hoursLeft = Math.ceil(timeDiff / (1000 * 60 * 60));
+
+                const notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item';
+                notificationItem.innerHTML = `
+                    <div class="notification-title">
+                        ${event.emoji || '✨'} ${event.title}
+                    </div>
+                    <div class="notification-time">
+                        ${eventDate.toLocaleDateString('pt-BR')} às ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+                        <br>
+                        Faltam ${hoursLeft} ${hoursLeft === 1 ? 'hora' : 'horas'}
+                    </div>
+                    ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+                `;
+                notificationList.appendChild(notificationItem);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function closeNotificationModal() {
+            const modal = document.getElementById('notification-modal');
+            modal.style.display = 'none';
+        }
+
+        function goToCalendar() {
+            closeNotificationModal();
+            // Scroll to calendar if needed
+            document.querySelector('.calendar').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Check for upcoming events when the page loads
+        window.addEventListener('load', () => {
+            setTimeout(checkUpcomingEvents, 1000); // Delay to ensure events are loaded
+        });
+
+        // Check for upcoming events every hour
+        setInterval(checkUpcomingEvents, 3600000); // 3600000 ms = 1 hour
 
         // Initialize calendar
         updateCalendar();
