@@ -42,7 +42,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
         }
 
@@ -70,7 +70,7 @@
         }
 
         .calendar-header button {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -81,12 +81,12 @@
             text-transform: uppercase;
             font-size: 0.8em;
             letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.2);
         }
 
         .calendar-header button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.3);
         }
 
         .calendar-header h2 {
@@ -134,13 +134,13 @@
         }
 
         .day.has-event {
-            background: linear-gradient(135deg, #1e4620 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #006064 0%, #2d2d2d 100%);
         }
 
         .day.today {
-            border: 2px solid #4CAF50;
+            border: 2px solid #00bcd4;
             background-color: #2d2d2d;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.3);
         }
 
         .event-emoji {
@@ -159,6 +159,7 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(5px);
+            z-index: 1000;
         }
 
         .modal-content {
@@ -171,6 +172,7 @@
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
+            z-index: 1001;
         }
 
         .modal-content::before {
@@ -180,7 +182,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
             animation: rotate 20s linear infinite;
         }
 
@@ -229,12 +231,12 @@
 
         .form-group input:focus {
             outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+            border-color: #00bcd4;
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.2);
         }
 
         .btn {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -245,12 +247,12 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.3);
         }
 
         .events-list {
@@ -291,7 +293,7 @@
         }
 
         .countdown {
-            color: #4CAF50;
+            color: #00bcd4;
             font-weight: 500;
         }
 
@@ -336,14 +338,14 @@
         }
 
         .emoji-option.selected {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+            background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.2);
         }
 
         .decorative-circle {
             position: absolute;
             border-radius: 50%;
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, transparent 100%);
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, transparent 100%);
             z-index: 0;
         }
 
