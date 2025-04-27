@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Eventos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            padding: 20px;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #2d2d2d;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .calendar-header button {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .calendar-header button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .calendar-header h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            text-transform: capitalize;
+            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: 500;
+            padding: 8px;
+            background-color: #3d3d3d;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            padding: 5px;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            font-size: 0.85em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 45px;
+            background-color: #2d2d2d;
+        }
+
+        .day:hover {
+            background-color: #3d3d3d;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .day.has-event {
+            background: linear-gradient(135deg, #1e4620 0%, #2d2d2d 100%);
+        }
+
+        .day.today {
+            border: 2px solid #4CAF50;
+            background-color: #2d2d2d;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .event-emoji {
+            font-size: 1.1em;
+            margin-top: 2px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #2d2d2d;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            color: #ffffff;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .close {
+            cursor: pointer;
+            font-size: 24px;
+            color: #ffffff;
+            transition: all 0.3s;
+        }
+
+        .close:hover {
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #3d3d3d;
+            border-radius: 8px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .events-list {
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .event-item {
+            background: linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .event-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .event-info {
+            flex-grow: 1;
+        }
+
+        .event-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
+        .event-date {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .countdown {
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3);
+        }
+
+        .emoji-selector {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .emoji-option {
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background-color: #1a1a1a;
+        }
+
+        .emoji-option:hover {
+            transform: scale(1.1);
+            background-color: #3d3d3d;
+        }
+
+        .emoji-option.selected {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, transparent 100%);
+            z-index: 0;
+        }
+
+        .circle-1 {
+            width: 200px;
+            height: 200px;
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 150px;
+            height: 150px;
+            bottom: -75px;
+            left: -75px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="decorative-circle circle-1"></div>
+        <div class="decorative-circle circle-2"></div>
+        <div class="calendar-header">
+            <button onclick="previousMonth()">&lt; Anterior</button>
+            <h2 id="current-month">Dezembro 2023</h2>
+            <button onclick="nextMonth()">Próximo &gt;</button>
+        </div>
+        <div class="calendar">
+            <div class="weekday">Dom</div>
+            <div class="weekday">Seg</div>
+            <div class="weekday">Ter</div>
+            <div class="weekday">Qua</div>
+            <div class="weekday">Qui</div>
+            <div class="weekday">Sex</div>
+            <div class="weekday">Sáb</div>
+        </div>
+        <div class="events-list" id="events-list">
+            <!-- Events will be displayed here -->
+        </div>
+    </div>
+
+    <div class="modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Evento</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="event-form" onsubmit="addEvent(event)">
+                <div class="form-group">
+                    <label for="event-title">Título do Evento</label>
+                    <input type="text" id="event-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-date">Data</label>
+                    <input type="date" id="event-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-time">Hora</label>
+                    <input type="time" id="event-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="event-description">Descrição</label>
+                    <input type="text" id="event-description">
+                </div>
+                <div class="form-group">
+                    <label>Emoji do Evento</label>
+                    <div class="emoji-selector" id="emoji-selector">
+                        <span class="emoji-option" data-emoji="✨">✨</span>
+                        <span class="emoji-option" data-emoji="🎉">🎉</span>
+                        <span class="emoji-option" data-emoji="🎂">🎂</span>
+                        <span class="emoji-option" data-emoji="🎯">🎯</span>
+                        <span class="emoji-option" data-emoji="💼">💼</span>
+                        <span class="emoji-option" data-emoji="🎨">🎨</span>
+                        <span class="emoji-option" data-emoji="🎵">🎵</span>
+                        <span class="emoji-option" data-emoji="🎮">🎮</span>
+                        <span class="emoji-option" data-emoji="🏃">🏃</span>
+                        <span class="emoji-option" data-emoji="📚">📚</span>
+                        <span class="emoji-option" data-emoji="🌟">🌟</span>
+                        <span class="emoji-option" data-emoji="🎪">🎪</span>
+                        <span class="emoji-option" data-emoji="🎭">🎭</span>
+                        <span class="emoji-option" data-emoji="🎪">🎪</span>
+                        <span class="emoji-option" data-emoji="🎨">🎨</span>
+                    </div>
+                    <input type="hidden" id="event-emoji" value="✨">
+                </div>
+                <button type="submit" class="btn">Salvar Evento</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let events = JSON.parse(localStorage.getItem('events')) || [];
+        let selectedEmoji = '✨';
+
+        // Emoji selector functionality
+        document.querySelectorAll('.emoji-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.emoji-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedEmoji = option.dataset.emoji;
+                document.getElementById('event-emoji').value = selectedEmoji;
+            });
+        });
+
+        function updateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('current-month').textContent = 
+                new Date(year, month).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startingDay = firstDay.getDay();
+            const totalDays = lastDay.getDate();
+
+            const calendar = document.querySelector('.calendar');
+            const weekdays = document.querySelectorAll('.weekday');
+            weekdays.forEach(day => day.remove());
+
+            // Add weekday headers
+            const weekdaysList = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            weekdaysList.forEach(day => {
+                const weekdayDiv = document.createElement('div');
+                weekdayDiv.className = 'weekday';
+                weekdayDiv.textContent = day;
+                calendar.appendChild(weekdayDiv);
+            });
+
+            // Clear previous days
+            const previousDays = document.querySelectorAll('.day');
+            previousDays.forEach(day => day.remove());
+
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < startingDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'day';
+                calendar.appendChild(emptyDay);
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= totalDays; day++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day';
+                dayDiv.textContent = day;
+
+                const currentDayDate = new Date(year, month, day);
+                if (currentDayDate.toDateString() === new Date().toDateString()) {
+                    dayDiv.classList.add('today');
+                }
+
+                // Check if there are events on this day
+                const dayEvents = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    return eventDate.toDateString() === currentDayDate.toDateString();
+                });
+
+                if (dayEvents.length > 0) {
+                    dayDiv.classList.add('has-event');
+                    const eventEmoji = document.createElement('div');
+                    eventEmoji.className = 'event-emoji';
+                    eventEmoji.textContent = dayEvents[0].emoji || '✨';
+                    dayDiv.appendChild(eventEmoji);
+                }
+
+                dayDiv.onclick = () => openModal(currentDayDate);
+                calendar.appendChild(dayDiv);
+            }
+
+            updateEventsList();
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendar();
+        }
+
+        function openModal(date) {
+            const modal = document.getElementById('event-modal');
+            const dateInput = document.getElementById('event-date');
+            dateInput.value = date.toISOString().split('T')[0];
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('event-modal');
+            modal.style.display = 'none';
+        }
+
+        function addEvent(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('event-title').value;
+            const date = document.getElementById('event-date').value;
+            const time = document.getElementById('event-time').value;
+            const description = document.getElementById('event-description').value;
+            const emoji = document.getElementById('event-emoji').value;
+
+            const newEvent = {
+                id: Date.now(),
+                title,
+                date: `${date}T${time}`,
+                description,
+                emoji
+            };
+
+            events.push(newEvent);
+            localStorage.setItem('events', JSON.stringify(events));
+            
+            closeModal();
+            updateCalendar();
+            document.getElementById('event-form').reset();
+        }
+
+        function deleteEvent(eventId) {
+            events = events.filter(event => event.id !== eventId);
+            localStorage.setItem('events', JSON.stringify(events));
+            updateCalendar();
+        }
+
+        function updateEventsList() {
+            const eventsList = document.getElementById('events-list');
+            eventsList.innerHTML = '';
+
+            const sortedEvents = [...events].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sortedEvents.forEach(event => {
+                const eventDate = new Date(event.date);
+                const now = new Date();
+                const timeDiff = eventDate - now;
+                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event-item';
+                eventDiv.innerHTML = `
+                    <div class="event-info">
+                        <div class="event-title">${event.emoji || '✨'} ${event.title}</div>
+                        <div class="event-date">${eventDate.toLocaleDateString('pt-BR')} ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                        ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+                    </div>
+                    <div class="countdown">${daysLeft > 0 ? `Faltam ${daysLeft} dias` : 'Evento passado'}</div>
+                    <button class="delete-btn" onclick="deleteEvent(${event.id})">Excluir</button>
+                `;
+                eventsList.appendChild(eventDiv);
+            });
+        }
+
+        // Initialize calendar
+        updateCalendar();
+    </script>
+</body>
+</html> 
