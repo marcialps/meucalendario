@@ -644,6 +644,21 @@
         </div>
     </div>
 
+    <div class="modal" id="upcoming-events-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Eventos Próximos</h3>
+                <span class="close" onclick="closeUpcomingEventsModal()">&times;</span>
+            </div>
+            <div class="events-list" id="upcoming-events-list">
+                <!-- Upcoming events will be listed here -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn secondary" onclick="closeUpcomingEventsModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentDate = new Date();
         let events = JSON.parse(localStorage.getItem('events')) || [];
@@ -978,6 +993,62 @@
         // Muda o fundo quando a página é recarregada
         window.addEventListener('beforeunload', () => {
             localStorage.removeItem('lastBackground');
+        });
+
+        function checkUpcomingEvents() {
+            const now = new Date();
+            const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+            
+            const upcomingEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate > now && eventDate <= threeDaysFromNow;
+            });
+
+            if (upcomingEvents.length > 0) {
+                showUpcomingEventsModal(upcomingEvents);
+            }
+        }
+
+        function showUpcomingEventsModal(upcomingEvents) {
+            const modal = document.getElementById('upcoming-events-modal');
+            const upcomingEventsList = document.getElementById('upcoming-events-list');
+            upcomingEventsList.innerHTML = '';
+
+            upcomingEvents.forEach(event => {
+                const eventDate = new Date(event.date);
+                const timeDiff = eventDate - new Date();
+                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event-item';
+                eventDiv.innerHTML = `
+                    <div class="event-info">
+                        <div class="event-title">${event.emoji || '✨'} ${event.title}</div>
+                        <div class="event-date">${eventDate.toLocaleDateString('pt-BR')} ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                        ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+                    </div>
+                    <div class="countdown">Faltam ${daysLeft} ${daysLeft === 1 ? 'dia' : 'dias'}</div>
+                    <div class="event-actions">
+                        <button class="edit-btn" onclick="openEditModal(${event.id})">Editar</button>
+                        <button class="delete-btn" onclick="deleteEvent(${event.id})">Excluir</button>
+                    </div>
+                `;
+                upcomingEventsList.appendChild(eventDiv);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function closeUpcomingEventsModal() {
+            const modal = document.getElementById('upcoming-events-modal');
+            modal.style.display = 'none';
+        }
+
+        // Check for upcoming events when the page loads
+        window.addEventListener('load', () => {
+            changeBackground();
+            setTimeout(checkPastEvents, 1000);
+            setTimeout(checkUpcomingEvents, 1000);
         });
     </script>
 </body>
