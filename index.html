@@ -361,6 +361,31 @@
             box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);
         }
 
+        .edit-btn {
+            background: transparent;
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
         .emoji-selector {
             margin-top: 10px;
             display: flex;
@@ -481,6 +506,15 @@
 
             .form-group input {
                 font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .event-actions {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .edit-btn, .delete-btn {
+                width: 50%;
             }
         }
 
@@ -624,6 +658,70 @@
             font-size: 0.7em;
             font-weight: bold;
         }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn.primary {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .btn.primary:hover {
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        .past-event-item {
+            background: rgba(30, 30, 30, 0.8);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        .past-event-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .past-event-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .past-event-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #ff3366;
+        }
+
+        .past-event-date {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -712,6 +810,72 @@
                 </div>
                 <button type="button" id="save-event-btn" class="btn">Salvar Evento</button>
             </form>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Evento</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-event-id">
+                <div class="form-group">
+                    <label for="edit-event-title">Título do Evento</label>
+                    <input type="text" id="edit-event-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-date">Data</label>
+                    <input type="date" id="edit-event-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-time">Hora</label>
+                    <input type="time" id="edit-event-time" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-event-description">Descrição</label>
+                    <input type="text" id="edit-event-description">
+                </div>
+                <div class="form-group">
+                    <label>Emoji do Evento</label>
+                    <div class="emoji-selector" id="edit-emoji-selector">
+                        <span class="emoji-option" data-emoji="✨">✨</span>
+                        <span class="emoji-option" data-emoji="🚀">🚀</span>
+                        <span class="emoji-option" data-emoji="🌌">🌌</span>
+                        <span class="emoji-option" data-emoji="🛸">🛸</span>
+                        <span class="emoji-option" data-emoji="⚡">⚡</span>
+                        <span class="emoji-option" data-emoji="💫">💫</span>
+                        <span class="emoji-option" data-emoji="🌟">🌟</span>
+                        <span class="emoji-option" data-emoji="🌠">🌠</span>
+                        <span class="emoji-option" data-emoji="🎮">🎮</span>
+                        <span class="emoji-option" data-emoji="🎯">🎯</span>
+                        <span class="emoji-option" data-emoji="🎪">🎪</span>
+                        <span class="emoji-option" data-emoji="🎨">🎨</span>
+                        <span class="emoji-option" data-emoji="🎵">🎵</span>
+                        <span class="emoji-option" data-emoji="🎭">🎭</span>
+                        <span class="emoji-option" data-emoji="🎪">🎪</span>
+                    </div>
+                    <input type="hidden" id="edit-event-emoji" value="✨">
+                </div>
+                <button type="button" id="update-event-btn" class="btn">Atualizar Evento</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="past-events-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Eventos Passados</h3>
+                <span class="close" onclick="closePastEventsModal()">&times;</span>
+            </div>
+            <div class="events-list" id="past-events-list">
+                <!-- Past events will be listed here -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn secondary" onclick="closePastEventsModal()">Fechar</button>
+                <button class="btn primary" onclick="deleteAllPastEvents()">Excluir Todos</button>
+            </div>
         </div>
     </div>
 
@@ -880,7 +1044,10 @@
                         ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
                     </div>
                     <div class="countdown">${daysLeft > 0 ? `Faltam ${daysLeft} dias` : 'Evento passado'}</div>
-                    <button class="delete-btn" onclick="deleteEvent(${event.id})">Excluir</button>
+                    <div class="event-actions">
+                        <button class="edit-btn" onclick="openEditModal(${event.id})">Editar</button>
+                        <button class="delete-btn" onclick="deleteEvent(${event.id})">Excluir</button>
+                    </div>
                 `;
                 eventsList.appendChild(eventDiv);
             });
@@ -951,6 +1118,252 @@
 
         // Initialize calendar
         updateCalendar();
+
+        // Emoji selector functionality for edit modal
+        document.querySelectorAll('#edit-emoji-selector .emoji-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('#edit-emoji-selector .emoji-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                document.getElementById('edit-event-emoji').value = option.dataset.emoji;
+            });
+        });
+
+        // Add event listener to the update button
+        document.getElementById('update-event-btn').addEventListener('click', updateEvent);
+
+        function openEditModal(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            const modal = document.getElementById('edit-modal');
+            const eventDate = new Date(event.date);
+
+            document.getElementById('edit-event-id').value = event.id;
+            document.getElementById('edit-event-title').value = event.title;
+            document.getElementById('edit-event-date').value = eventDate.toISOString().split('T')[0];
+            document.getElementById('edit-event-time').value = eventDate.toTimeString().slice(0, 5);
+            document.getElementById('edit-event-description').value = event.description || '';
+            document.getElementById('edit-event-emoji').value = event.emoji || '✨';
+
+            // Select the current emoji
+            document.querySelectorAll('#edit-emoji-selector .emoji-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.emoji === (event.emoji || '✨')) {
+                    option.classList.add('selected');
+                }
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('edit-modal');
+            modal.style.display = 'none';
+            document.getElementById('edit-form').reset();
+        }
+
+        function updateEvent() {
+            const id = parseInt(document.getElementById('edit-event-id').value);
+            const title = document.getElementById('edit-event-title').value;
+            const date = document.getElementById('edit-event-date').value;
+            const time = document.getElementById('edit-event-time').value;
+            const description = document.getElementById('edit-event-description').value;
+            const emoji = document.getElementById('edit-event-emoji').value;
+
+            if (!title || !date || !time) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            const eventIndex = events.findIndex(event => event.id === id);
+            if (eventIndex === -1) return;
+
+            events[eventIndex] = {
+                ...events[eventIndex],
+                title,
+                date: `${date}T${time}`,
+                description,
+                emoji
+            };
+
+            localStorage.setItem('events', JSON.stringify(events));
+            closeEditModal();
+            updateCalendar();
+        }
+
+        function checkPastEvents() {
+            const now = new Date();
+            const pastEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate < now;
+            });
+
+            if (pastEvents.length > 0) {
+                showPastEventsModal(pastEvents);
+            }
+        }
+
+        function showPastEventsModal(pastEvents) {
+            const modal = document.getElementById('past-events-modal');
+            const pastEventsList = document.getElementById('past-events-list');
+            pastEventsList.innerHTML = '';
+
+            pastEvents.forEach(event => {
+                const eventDate = new Date(event.date);
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'past-event-item';
+                eventDiv.innerHTML = `
+                    <div class="past-event-info">
+                        <div class="past-event-title">${event.emoji || '✨'} ${event.title}</div>
+                        <div class="past-event-date">${eventDate.toLocaleDateString('pt-BR')} ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
+                        ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteEvent(${event.id})">Excluir</button>
+                `;
+                pastEventsList.appendChild(eventDiv);
+            });
+
+            modal.style.display = 'flex';
+        }
+
+        function closePastEventsModal() {
+            const modal = document.getElementById('past-events-modal');
+            modal.style.display = 'none';
+        }
+
+        function deleteAllPastEvents() {
+            if (confirm('Tem certeza que deseja excluir todos os eventos passados?')) {
+                const now = new Date();
+                events = events.filter(event => new Date(event.date) >= now);
+                localStorage.setItem('events', JSON.stringify(events));
+                closePastEventsModal();
+                updateCalendar();
+            }
+        }
+
+        // Check for past events when the page loads
+        window.addEventListener('load', () => {
+            setTimeout(checkPastEvents, 1000); // Delay to ensure events are loaded
+        });
+
+        // Verifica se o navegador suporta notificações
+        function checkNotificationSupport() {
+            if (!("Notification" in window)) {
+                console.log("Este navegador não suporta notificações desktop");
+                return false;
+            }
+            return true;
+        }
+
+        // Solicita permissão para notificações
+        async function requestNotificationPermission() {
+            if (!checkNotificationSupport()) return false;
+
+            try {
+                const permission = await Notification.requestPermission();
+                return permission === "granted";
+            } catch (error) {
+                console.error("Erro ao solicitar permissão de notificação:", error);
+                return false;
+            }
+        }
+
+        // Registra o Service Worker para notificações em segundo plano
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) {
+                console.log("Service Worker não suportado");
+                return false;
+            }
+
+            try {
+                const registration = await navigator.serviceWorker.register('service-worker.js');
+                console.log("Service Worker registrado com sucesso:", registration);
+                return true;
+            } catch (error) {
+                console.error("Erro ao registrar Service Worker:", error);
+                return false;
+            }
+        }
+
+        // Verifica se é um dispositivo móvel
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Configura as notificações
+        async function setupNotifications() {
+            if (!isMobileDevice()) return;
+
+            const hasPermission = await requestNotificationPermission();
+            if (!hasPermission) return;
+
+            const workerRegistered = await registerServiceWorker();
+            if (!workerRegistered) return;
+
+            // Agenda verificação de eventos a cada hora
+            setInterval(checkEventsForNotification, 3600000);
+            // Verifica imediatamente ao carregar
+            checkEventsForNotification();
+        }
+
+        // Verifica eventos para notificação
+        function checkEventsForNotification() {
+            const now = new Date();
+            const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
+
+            events.forEach(event => {
+                const eventDate = new Date(event.date);
+                if (eventDate > now && eventDate <= oneHourFromNow) {
+                    showEventNotification(event);
+                }
+            });
+        }
+
+        // Mostra a notificação do evento
+        function showEventNotification(event) {
+            if (!checkNotificationSupport()) return;
+
+            const eventDate = new Date(event.date);
+            const options = {
+                body: `Data: ${eventDate.toLocaleDateString('pt-BR')}\nHora: ${eventDate.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}\n${event.description || ''}`,
+                icon: 'https://cdn-icons-png.flaticon.com/512/3652/3652191.png',
+                badge: 'https://cdn-icons-png.flaticon.com/512/3652/3652191.png',
+                vibrate: [200, 100, 200],
+                tag: `event-${event.id}`,
+                renotify: true,
+                actions: [
+                    {
+                        action: 'view',
+                        title: 'Ver Evento'
+                    },
+                    {
+                        action: 'delete',
+                        title: 'Excluir'
+                    }
+                ]
+            };
+
+            const notification = new Notification(`${event.emoji || '✨'} ${event.title}`, options);
+
+            notification.onclick = function(event) {
+                event.preventDefault();
+                window.focus();
+                this.close();
+                // Aqui você pode adicionar lógica para abrir o evento no calendário
+            };
+
+            notification.onaction = function(event) {
+                if (event.action === 'delete') {
+                    deleteEvent(event.id);
+                }
+            };
+        }
+
+        // Inicializa as notificações quando a página carregar
+        window.addEventListener('load', () => {
+            setupNotifications();
+            setTimeout(checkPastEvents, 1000);
+        });
     </script>
 </body>
 </html> 
